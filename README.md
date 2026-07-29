@@ -1,128 +1,143 @@
 # CTViewer – DICOM CT / RTSTRUCT / RTDOSE Viewer
 
-A lightweight Treatment Planning System (TPS) prototype developed in **C++ / Qt** for learning radiotherapy image processing and dose calculation.
+A lightweight **Treatment Planning System (TPS)** prototype developed in **C++17 / Qt** for learning radiotherapy treatment planning, medical image processing, and dose calculation.
 
-The project focuses on loading DICOM datasets, displaying CT images, importing RTSTRUCT/RTDOSE, visualizing dose distribution, and performing quantitative dose analysis.
+The application supports loading DICOM CT images, RT Structure Sets (RTSTRUCT), RT Dose (RTDOSE), visualizing treatment data, and performing quantitative dose analysis through coordinate transformation and dose interpolation.
 
 ---
 
 # Features
 
-## Milestone 1 – CT Volume & Viewer ✅
+## CT DICOM Support
 
-### DICOM CT Import
-- Import a complete CT DICOM series.
-- Automatically detect and sort slices.
-- Build a 3D CT volume.
-- Read patient and study information.
+### DICOM Import
+
+- Import an entire CT DICOM series
+- Automatically detect and sort image slices
+- Construct a 3D CT volume
+- Read patient and study metadata
 
 ### CT Volume
-- Store
-  - voxel HU values
-  - spacing
-  - origin
-  - direction matrix
-  - Image Position Patient (IPP)
 
-### Slice Viewer
-- Display axial CT slices.
-- Mouse wheel slice scrolling.
-- Window / Level adjustment.
-- Zoom & Pan.
-- HU value display under mouse cursor.
-- Patient information panel.
+Store complete CT volume information:
+
+- Hounsfield Unit (HU) voxel values
+- Image spacing
+- Image origin
+- Image orientation (Direction Cosines)
+- Image Position Patient (IPP)
 
 ---
 
-## Milestone 2 – RTSTRUCT Support ✅
+## CT Viewer
+
+Interactive CT image viewer featuring
+
+- Axial slice visualization
+- Mouse wheel slice navigation
+- Window / Level adjustment
+- Zoom
+- Pan
+- HU value inspection
+- Patient information display
+
+---
+
+## RT Structure Support
 
 ### RTSTRUCT Import
-- Parse RT Structure Set.
-- Read all structures.
+
+- Parse RT Structure Set DICOM files
+- Load all available structures
 
 ### Structure Processing
-- Convert contour points into image coordinates.
-- Rasterize contours into binary masks.
-- Build 3D mask volume.
 
-### Structure Viewer
-- Display contour overlay.
-- Toggle structure visibility.
-- Different colors for each structure.
+- Convert contour points into CT image coordinates
+- Rasterize contours into binary masks
+- Generate 3D mask volumes
+
+### Visualization
+
+- Display contour overlays
+- Toggle structure visibility
+- Individual color assignment for each structure
 
 ---
 
-## Milestone 3 – RTDOSE Support ✅
+## RT Dose Support
 
 ### RTDOSE Import
-- Load RT Dose DICOM.
-- Build 3D Dose Grid.
+
+- Load RT Dose DICOM
+- Construct a 3D dose grid
 
 Store
 
 - Dose Grid Scaling
-- Pixel Data
+- Dose voxel values
 - Grid Frame Offset Vector
 - Origin
-- Direction
+- Direction Cosines
 - Dose spacing
 
 ---
 
-### Coordinate Alignment
+## Coordinate Transformation
 
-Implemented full coordinate transformation between
+Implemented a complete coordinate transformation pipeline between
 
+```
 CT Index
-↓
-
+      ↓
 Patient Coordinate (mm)
-↓
-
+      ↓
 Dose Grid Index
+```
 
 Supports
 
-- different origins
-- different spacing
-- different slice thickness
-- different image orientation
+- Different image origins
+- Different voxel spacing
+- Different slice thickness
+- Different image orientations
+
+The coordinate transformation guarantees correct mapping between CT images and RT Dose regardless of acquisition geometry.
 
 ---
 
-### Dose Sampler
+## Dose Sampling
 
-Implemented two independent sampling pipelines.
+Implemented two independent dose sampling pipelines.
 
-#### Display Sampling
+### Display Sampling
 
-Optimized for interactive rendering.
+Optimized for interactive visualization.
 
 Features
 
-- Nearest Neighbor
+- Nearest Neighbor interpolation
 - Trilinear interpolation
-- Cache for repeated queries
-- Fast enough for real-time mouse movement
+- Cached sampling
+- Real-time performance
 
 Used for
 
-- dose overlay
-- cursor inspection
-- slice rendering
+- Dose overlay
+- Mouse cursor inspection
+- Interactive slice rendering
 
 ---
 
-#### Quantitative Sampling
+### Quantitative Sampling
 
-Designed for clinical calculations.
+Designed for accurate clinical dose calculation.
 
 Features
 
 - Pure trilinear interpolation
-- No cache
+- No caching
 - Optional supersampling
-- Higher precision
+- High precision
 
 Used for
 
@@ -133,7 +148,7 @@ Used for
 
 ---
 
-### Dose Statistics
+## Dose Statistics
 
 Implemented
 
@@ -141,42 +156,42 @@ Implemented
 - Maximum Dose
 - Minimum Dose
 
-Calculated directly from
+Calculation workflow
 
+```
 Mask Volume
-↓
-
-Coordinate Alignment
-↓
-
+      ↓
+Coordinate Transformation
+      ↓
 Dose Sampler
-↓
-
+      ↓
 Dose Grid
+```
 
 ---
 
-# Current Architecture
+# System Architecture
 
 ```
-DICOM CT
-        │
-        ▼
- CTVolume
-        │
-        ▼
-Coordinate Alignment
-        │
-        ├──────────────► Display Sampling
-        │                     │
-        │                     ▼
-        │               Dose Overlay
-        │
-        ▼
- Quantitative Sampling
-        │
-        ▼
- Mean / Max / Min Dose
+                    DICOM CT
+                        │
+                        ▼
+                   CT Volume
+                        │
+                        ▼
+            Coordinate Transformation
+                │                 │
+                │                 ▼
+                │         Display Sampling
+                │                 │
+                │                 ▼
+                │       Dose Visualization
+                │
+                ▼
+        Quantitative Sampling
+                │
+                ▼
+      Mean / Max / Min Dose
 ```
 
 ---
@@ -191,72 +206,124 @@ Coordinate Alignment
 
 ---
 
+# Project Structure
+
+```
+Treatment-Plan-System-TPS
+│
+├── CTViewerApp/
+├── src/
+├── CMakeLists.txt
+├── CMakePresets.json
+└── README.md
+```
+
+---
+
 # Build
 
-```bash
-git clone https://github.com/yourname/CTViewer.git
+## Requirements
 
+- Visual Studio 2022
+- CMake 3.16+
+- Qt 6.x
+- DCMTK
+- C++17
+
+---
+
+## Clone
+
+```bash
+git clone https://github.com/hahuuthai/Treatment-Plan-System-TPS-.git
+cd Treatment-Plan-System-TPS-
+```
+
+---
+
+## Configure
+
+```bash
 mkdir build
 cd build
 
 cmake ..
-cmake --build .
+```
+
+---
+
+## Build
+
+```bash
+cmake --build . --config Release
+```
+
+---
+
+## Run
+
+The executable will be generated inside the build output directory.
+
+Example
+
+```
+build/Release/CTViewerApp.exe
 ```
 
 ---
 
 # Usage
 
-## 1. Load CT
+## Load CT Images
 
 ```
 File
-    → Open CT Folder
+└── Open CT Folder
 ```
 
-Select a DICOM CT folder.
+Select a folder containing a CT DICOM series.
 
 ---
 
-## 2. Load RTSTRUCT
+## Import RTSTRUCT
 
 ```
 File
-    → Import RTSTRUCT
+└── Import RTSTRUCT
 ```
 
-The contours will be displayed on CT slices.
+Structure contours will automatically be displayed on CT slices.
 
 ---
 
-## 3. Load RTDOSE
+## Import RTDOSE
 
 ```
 File
-    → Import RTDOSE
+└── Import RTDOSE
 ```
 
-The dose grid will be registered to the CT coordinate system.
+The RT Dose grid is automatically registered to the CT coordinate system.
 
 ---
 
-## 4. Inspect Dose
+## Inspect Dose
 
 Move the mouse over the CT image.
 
 The viewer displays
 
-- CT HU
+- CT HU value
 - Dose value
-- Patient coordinate
+- Patient coordinates
 
 ---
 
-## 5. Dose Statistics
+## Calculate Dose Statistics
 
 Select a structure.
 
-The program computes
+The program calculates
 
 - Mean Dose
 - Maximum Dose
@@ -269,36 +336,47 @@ using the Quantitative Sampling pipeline.
 # Project Status
 
 | Module | Status |
-|---------|--------|
-| CT Loader | ✅ |
+|-----------------------------|:------:|
+| CT DICOM Import | ✅ |
+| CT Volume Construction | ✅ |
 | CT Viewer | ✅ |
-| Window/Level | ✅ |
-| RTSTRUCT Loader | ✅ |
+| Window / Level | ✅ |
+| RTSTRUCT Import | ✅ |
 | Contour Rasterization | ✅ |
-| Mask Volume | ✅ |
-| RTDOSE Loader | ✅ |
-| Coordinate Alignment | ✅ |
-| Dose Sampler | ✅ |
+| 3D Mask Volume | ✅ |
+| RTDOSE Import | ✅ |
+| Coordinate Transformation | ✅ |
+| Dose Sampling | ✅ |
 | Mean Dose | ✅ |
-| Max Dose | ✅ |
-| Min Dose | ✅ |
+| Maximum Dose | ✅ |
+| Minimum Dose | ✅ |
 | Dose Overlay | 🚧 Improving |
 | DVH | ⏳ Planned |
+| RTPLAN Support | ⏳ Planned |
+| 3D Volume Rendering | ⏳ Planned |
 
 ---
 
 # Future Work
 
-- Dose color wash overlay
-- DVH (Dose Volume Histogram)
-- Isodose line visualization
-- Dose profile
-- Multi-plan comparison
-- RTPLAN support
-- 3D volume rendering
+- Dose Color Wash Overlay
+- Dose Volume Histogram (DVH)
+- Isodose Line Visualization
+- Dose Profile Analysis
+- RTPLAN Support
+- Multi-plan Comparison
+- 3D Volume Rendering
+- GPU acceleration for dose visualization
 
 ---
 
 # Author
 
-Developed as part of a personal project for learning Treatment Planning System (TPS) algorithms, medical image processing, and radiotherapy dose analysis.
+Developed as a personal project for studying
+
+- Treatment Planning Systems (TPS)
+- DICOM RT standards
+- Medical image processing
+- Coordinate transformation
+- Dose interpolation
+- Radiotherapy dose analysis
