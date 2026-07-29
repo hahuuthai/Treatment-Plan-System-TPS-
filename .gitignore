@@ -1,0 +1,14 @@
+# Bỏ qua thư mục biên dịch và file sinh ra khi build
+build/
+bin/
+obj/
+Debug/
+Release/
+x64/
+x86/
+
+# Bỏ qua cấu hình cá nhân của Visual Studio / VS Code
+.vs/
+.vscode/
+*.user
+*.suo
